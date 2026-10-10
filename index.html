@@ -262,4 +262,60 @@ onAuthStateChanged(auth, user => {
   }
 });
 </script>
+  <section id="earning-tasks" style="background:white;padding:20px;margin:20px 0;border-radius:15px;">
+  <h2>💰 Earning Tasks</h2>
+  <p>Explore tasks and track your progress.</p>  <div style="border:1px solid #ddd;padding:15px;margin:10px 0;border-radius:10px;">
+    <h3>📖 Daily Reading</h3>
+    <p>Read an educational article.</p>
+    <p><strong>Demo reward: GH₵1.00</strong></p>
+    <button onclick="completeDemoTask('reading')" style="background:#087f45;color:white;padding:12px;width:100%;">Complete Task</button>
+    <p id="reading-status"></p>
+  </div>  <div style="border:1px solid #ddd;padding:15px;margin:10px 0;border-radius:10px;">
+    <h3>🧠 Knowledge Quiz</h3>
+    <p>Practise your knowledge with a quiz.</p>
+    <p><strong>Demo reward: GH₵2.00</strong></p>
+    <button onclick="completeDemoTask('quiz')" style="background:#087f45;color:white;padding:12px;width:100%;">Complete Task</button>
+    <p id="quiz-status"></p>
+  </div>  <p style="font-size:12px;color:#777;">Demo only: these tasks do not generate real money or guarantee earnings.</p>
+</section><section id="my-wallet" style="background:white;padding:20px;margin:20px 0;border-radius:15px;">
+  <h2>💳 My Wallet</h2>
+  <p>Demo balance</p>
+  <h1 id="demo-balance" style="color:#087f45;">GH₵0.00</h1>
+  <p id="wallet-message">Complete a demo task to test the wallet.</p>
+  <button onclick="resetDemoWallet()" style="background:#e6f4ec;color:#087f45;padding:12px;width:100%;">Reset Demo</button>
+  <p style="font-size:12px;color:#777;">Demo balance only. Withdrawals and real payments are not enabled.</p>
+</section><script>
+let demoBalance = 0;
+const completedDemoTasks = [];
+
+function completeDemoTask(task) {
+  if (completedDemoTasks.includes(task)) {
+    document.getElementById(task + "-status").textContent =
+      "You've already tested this task.";
+    return;
+  }
+
+  completedDemoTasks.push(task);
+  const reward = task === "reading" ? 1 : 2;
+  demoBalance += reward;
+
+  document.getElementById(task + "-status").textContent =
+    "Demo task completed!";
+  document.getElementById("demo-balance").textContent =
+    "GH₵" + demoBalance.toFixed(2);
+  document.getElementById("wallet-message").textContent =
+    "Demo balance updated successfully!";
+}
+
+function resetDemoWallet() {
+  demoBalance = 0;
+  completedDemoTasks.length = 0;
+
+  document.getElementById("demo-balance").textContent = "GH₵0.00";
+  document.getElementById("wallet-message").textContent =
+    "Demo balance reset.";
+  document.getElementById("reading-status").textContent = "";
+  document.getElementById("quiz-status").textContent = "";
+}
+</script>
 </html>

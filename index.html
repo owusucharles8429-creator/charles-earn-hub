@@ -126,4 +126,140 @@ function showNotice(){
 alert("Withdrawals and real payments are not available in this demo version.");
 }
 </script></body>
+  <section id="account" style="background:white;padding:20px;margin:20px 0;border-radius:15px;">
+  <h2>👤 Your Account</h2>
+  <p id="authStatus">Create an account or log in.</p>
+
+  <div id="authForm">
+    <input id="displayName" type="text" placeholder="Your name"
+      style="width:100%;padding:12px;margin:6px 0;box-sizing:border-box;border:1px solid #ddd;border-radius:8px;">
+
+    <input id="email" type="email" placeholder="Email address"
+      style="width:100%;padding:12px;margin:6px 0;box-sizing:border-box;border:1px solid #ddd;border-radius:8px;">
+
+    <input id="password" type="password" placeholder="Password (at least 6 characters)"
+      style="width:100%;padding:12px;margin:6px 0;box-sizing:border-box;border:1px solid #ddd;border-radius:8px;">
+
+    <button id="registerBtn" style="background:#087f45;color:white;width:100%;margin:6px 0;">
+      Create Account
+    </button>
+
+    <button id="loginBtn" style="background:#e6f4ec;color:#087f45;width:100%;margin:6px 0;">
+      Log In
+    </button>
+  </div>
+
+  <button id="logoutBtn" hidden
+    style="background:#087f45;color:white;width:100%;">
+    Log Out
+  </button>
+
+  <p id="authMessage" style="font-size:13px;overflow-wrap:anywhere;"></p>
+</section>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyArBHpif8kdABmFUCBq28KSOWPKfKNR06I",
+  authDomain: "charles-earn-hub.firebaseapp.com",
+  projectId: "charles-earn-hub",
+  storageBucket: "charles-earn-hub.firebasestorage.app",
+  messagingSenderId: "993050820098",
+  appId: "1:993050820098:web:3df4b4473abca926f9711b"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const message = document.getElementById("authMessage");
+const status = document.getElementById("authStatus");
+const form = document.getElementById("authForm");
+const logoutBtn = document.getElementById("logoutBtn");
+
+document.getElementById("registerBtn").addEventListener("click", async () => {
+  const name = document.getElementById("displayName").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  if (!name || !email || !password) {
+    message.textContent = "Please enter your name, email, and password.";
+    return;
+  }
+
+  message.textContent = "Creating your account...";
+
+  try {
+    const credential = await createUserWithEmailAndPassword(
+      auth, email, password
+    );
+
+    await setDoc(doc(db, "users", credential.user.uid), {
+      displayName: name,
+      email: credential.user.email,
+      createdAt: serverTimestamp()
+    });
+
+    message.textContent = "Account created successfully!";
+  } catch (error) {
+    message.textContent = error.message;
+  }
+});
+
+document.getElementById("loginBtn").addEventListener("click", async () => {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  if (!email || !password) {
+    message.textContent = "Enter your email and password.";
+    return;
+  }
+
+  message.textContent = "Logging in...";
+
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    message.textContent = "You are logged in successfully!";
+  } catch (error) {
+    message.textContent = error.message;
+  }
+});
+
+logoutBtn.addEventListener("click", async () => {
+  try {
+    await signOut(auth);
+    message.textContent = "You have logged out.";
+  } catch (error) {
+    message.textContent = error.message;
+  }
+});
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    status.textContent = "Logged in: " + user.email;
+    form.hidden = true;
+    logoutBtn.hidden = false;
+  } else {
+    status.textContent = "Create an account or log in.";
+    form.hidden = false;
+    logoutBtn.hidden = true;
+  }
+});
+</script>
 </html>
